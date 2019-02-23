@@ -1,0 +1,203 @@
+/********************************
+GENERAL
+********************************/
+
+body{
+  font-family: 'Open Sans', sans-serif;
+}
+
+#wrapper{
+  max-width: 940px;
+  margin: 0 auto;
+  padding: 0 5%;
+  overflow: hidden;
+}
+
+a {
+  text-decoration: none;
+}
+
+img {
+  max-width: 100%;
+}
+
+h3{
+  margin: 0 0 1em 0;
+}
+
+.center {
+  text-align: center;
+}
+
+/********************************
+HEADING
+********************************/
+
+header{
+  float: left;
+  margin: 0 0 30px 0;
+  padding: 5px 0 0 0;
+  width: 100%;
+}
+
+#logo {
+  text-align: center;
+  margin: 0;
+}
+
+h1{
+  font-family: 'Changa One', sans-serif;
+  margin: 15px, 0;
+  font-size: 1.75em;
+  font-weight: normal;
+  line-height: 0.8em;
+}
+
+h2{
+  font-size: 0.75em;
+  margin: -5px 0 0;
+  font-weight: normal;
+}
+
+
+/********************************
+NAVIGATION
+********************************/
+
+nav{
+  text-align: center;
+  margin: 20px 0 0;
+  padding: 10px 0;
+}
+
+nav ul{
+  list-style: none;
+  margin: 0 10px;
+  padding: 0;
+}
+
+nav li{
+  display: inline-block;
+}
+
+nav a{
+  font-weight: 800;
+  padding: 15px 10px;
+}
+
+
+/********************************
+FOOTER
+********************************/
+
+footer{
+  text-align: center;
+  clear: both;
+  font-size: 0.75em;
+  color: #ccc;
+  padding-top: 50px;
+}
+
+.link-ico{
+  width: 30px;
+  height: 30px;
+  margin: 0 5px;
+}
+
+
+/********************************
+PAGE: Item details
+********************************/
+
+.profile-photo{
+  max-width: 150px;
+  display: block;
+  margin: 0 auto 30px;
+  
+}
+
+/********************************
+PAGE: Main pages 
+********************************/
+
+.flexLinks{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.flexLinks a {
+  display: inline-block;
+}
+
+#gallery{
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+#gallery li{
+  float: left;
+  width: 45%;
+  margin: 2.5%;
+  background-color: #f5f5f5;
+  color: #bdc3c7;
+}
+
+#gallery li:nth-child(3n){
+  clear: left;
+}
+
+#gallery li p{
+  margin: 0;
+  padding: 5%;
+  font-size: 0.75em;
+  color: #bdc3c7;
+  display: inline-block;
+}
+
+.goRight {
+  float: right;
+}
+
+
+/********************************
+COLOR
+********************************/
+
+/* site body */
+body {
+  background-color: #fff;
+  color : #999;
+}
+
+/* header color green */
+header {
+  background: #6ab47b;
+  border-color: #599a68;
+}
+
+/* nav background */
+nav {
+  background: #599a68;
+}
+
+/* logo text */
+h1, h2 {
+  color : #fff;
+}
+
+/* links */
+a {
+  color : #6ab47b;
+}
+
+/* links navigation */
+nav a, nav a:visited {
+  color : #fff;
+}
+
+/* links navigation selected & hover */
+nav a.selected, nav a:hover {
+  color: #32673f;
+}

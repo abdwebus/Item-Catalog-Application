@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<link rel=stylesheet type=text/css href="{{ url_for('static', filename='normalize.css') }}">
+    <link href='http://fonts.googleapis.com/css?family=Changa+One|Open+Sans:400italic,700italic,400,700,800' rel='stylesheet' type='text/css'>
+    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='main.css') }}">
+    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='responsive.css') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+	<title>Item Catalog Application</title>
+</head>
+<body>
+	{% include "header.html" %}
+	<section id="wrapper">
+		{% block content %}
+		{% endblock %}
+	</section>
+	<footer>
+        <p>&copy; 2019 Abdulwahab Alansari</p>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,48 @@
+{% extends "main.html" %}
+{% block content %}
+<!-- <section>
+	<h3>{{ category.name }}</h3>
+	<h4>{{ creator.name }}</h4>
+</section> -->
+<section>
+	<div class="flexLinks">
+		<img src="{{ url_for('static', filename='addIcon.png') }}" alt="Add" class="link-ico">
+		<a href="{{ url_for('newItem', category_id = category.id) }}">Add new Item</a>	
+	</div>
+</section>
+<!-- <section>
+	<a href="{{ url_for('newItem', category_id = category.id) }}">Add new Item</a>
+	<hr>
+</section> -->
+<section>
+	<ul id="gallery">
+		{% for item in items %}
+		{% if item.user_id == session['user_id'] %}
+		<!-- <li>{{ item.name }} (Created by: {{ item.user.name }}) - 
+			<a href="{{ url_for('editItem', category_id = category.id, item_id = item.id) }}">Edit</a>
+			<a href="{{ url_for('deleteItem', category_id = category.id, item_id = item.id) }}">Delete</a>
+		</li> -->
+		<li>
+	        <a href="{{ url_for('showItemDetails', category_id = category.id, item_id = item.id ) }}">
+	          <img src="https://picsum.photos/400/300/?random" alt="Item">
+	        </a>
+	        <p>{{ item.name }}</p>
+	        <p class="goRight"><a href="{{ url_for('editItem', category_id = category.id, item_id = item.id) }}">Edit</a> | 
+	        <a href="{{ url_for('deleteItem', category_id = category.id, item_id = item.id) }}">Delete</a></p>
+	     </li>
+		{% else %}
+		<!-- <li>{{ item.name }} (Created by: {{ item.user.name }})</li> -->
+		<li>
+         <a href="{{ url_for('showItemDetails', category_id = category.id, item_id = item.id ) }}">
+           <img src="https://picsum.photos/400/300/?random" alt="Category">
+         </a>
+         <p>{{ item.name }}</p>
+         <p class="goRight"><i>Created by different user</i></p>
+      </li>
+		{% endif %}
+		{% endfor %}
+	</ul>
+</section>
+
+
+{% endblock %}

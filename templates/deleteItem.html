@@ -1,0 +1,14 @@
+{% extends "main.html" %}
+{% block content %}
+<section>
+	<form class="center" action="#" method = "post">
+		Are you sure you want to delete {{ item.name }}?</br>
+	
+		<button type="submit" type="submit">Yes</button>
+		<a href="{{ url_for('showItem', category_id = item.category_id) }}">Cancel</a>
+	</form>
+	
+</section>
+
+
+{% endblock %}

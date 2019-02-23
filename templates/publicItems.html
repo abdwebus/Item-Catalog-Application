@@ -1,0 +1,26 @@
+{% extends "main.html" %}
+{% block content %}
+<!-- <section>
+	<h3>{{ category.name }}</h3>
+	<h4>{{ creator.name }}</h4>
+</section>
+<section>
+	<a href="{{ url_for('newItem', category_id = category.id) }}">Add new Item</a>
+	<hr>
+</section> -->
+<section>
+	<ul id="gallery">
+		{% for item in items %}
+		<li>
+	        <a href="{{ url_for('showItemDetails', category_id = category.id, item_id = item.id ) }}">
+	          <img src="https://picsum.photos/400/300/?random" alt="Item">
+	        </a>
+        	<p>{{ item.name }}</p>
+      	</li>
+
+		{% endfor %}
+	</ul>
+</section>
+
+
+{% endblock %}

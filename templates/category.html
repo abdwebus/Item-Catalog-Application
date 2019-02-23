@@ -1,0 +1,33 @@
+{% extends "main.html" %}
+{% block content %}
+<section>
+	<div class="flexLinks">
+		<img src="{{ url_for('static', filename='addIcon.png') }}" alt="Add" class="link-ico">
+		<a href="{{ url_for('newCategory') }}">Add new Category</a>	
+	</div>
+</section>
+<section>
+    <ul id="gallery">
+    {% for category in categories %}
+    	{% if category.user_id == session['user_id'] %}
+    	<li>
+	        <a href="{{ url_for('showItem', category_id = category.id) }}">
+	          	<img src="https://picsum.photos/400/300/?random" alt="Category">
+	        </a>
+	        <p>{{ category.name }}</p>
+	        <p class="goRight"><a href="{{ url_for('editCategory', category_id = category.id) }}">Edit</a> | 
+	        <a href="{{ url_for('deleteCategory', category_id = category.id) }}">Delete</a></p>
+	    </li>
+    	{% else %}
+       	<li>
+         	<a href="{{ url_for('showItem', category_id = category.id) }}">
+           		<img src="https://picsum.photos/400/300/?random" alt="Category">
+         	</a>
+         	<p>{{ category.name }}</p>
+         	<p class="goRight"><i>Created by different user</i></p>
+      	</li>
+    	{% endif %}
+    {% endfor %}
+    </ul>
+</section>
+{% endblock %}

@@ -1,0 +1,10 @@
+{% extends "main.html" %}
+{% block content %}
+<section>
+	<img src="{{ item.image }}" alt="{{ item.name }}" class="profile-photo">
+      <h3>{{ item.name }}</h3>
+      <p>{{ item.description }}</p>
+</section>
+
+
+{% endblock %}
