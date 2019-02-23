@@ -2,7 +2,7 @@
 {% block content %}
 <section>
 	<form class="center" action="#" method = "post">
-		<input type ="text" name="name" value="{{ category.name }}" placeholder="Name">
+		<input type ="text" name="name" value="{{ category.name }}" placeholder="Name" required>
 		<button type="submit" type="submit">Save</button>
 		<a href="{{ url_for('showCategories') }}">Cancel</a>
 	</form>

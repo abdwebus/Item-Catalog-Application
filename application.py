@@ -2,6 +2,7 @@
 
 from flask import Flask, render_template, request
 from flask import redirect, jsonify, url_for
+from functools import wraps
 from sqlalchemy import create_engine, asc
 from sqlalchemy.orm import sessionmaker
 from models import Base, Category, Item, User
@@ -34,12 +35,15 @@ DBSession = sessionmaker(bind=engine)
 
 # Operations on OAuth2
 
-# Create a state token to prevent request forgery.
-# Store it in the session for later validation
-
 
 @app.route('/login')
 def showLogin():
+    ''' Create a state token to prevent request forgery.
+        Store it in the session for later validation
+
+    Returns:
+        to login page
+    '''
     state = ''.join(random.choice(string.ascii_uppercase +
                                   string.digits) for x in xrange(32))
     login_session['state'] = state
@@ -50,6 +54,14 @@ def showLogin():
 
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
+    ''' Handle google login transaction
+
+
+    Returns:
+        username login session when login is successful
+        error response if error occured
+    '''
+
     # Validate state token
     if request.args.get('state') != login_session['state']:
         response = make_response(json.dumps('Invalid state parameter.'), 401)
@@ -131,6 +143,14 @@ def gconnect():
 # Handle google logout
 @app.route('/gdisconnect')
 def gdisconnect():
+    ''' Handle google disconnect transaction
+
+
+    Returns:
+        to main page when disconnect is successful
+        error response if error ocurred
+    '''
+
     # Only disconnect a connected user.
     access_token = login_session.get('access_token')
     if access_token is None:
@@ -153,6 +173,14 @@ def gdisconnect():
 
 
 def createUser(login_session):
+    ''' Creates a new user in the database
+
+    Args:
+        login_session: session object with user data.
+
+    Returns:
+        user.id: generated distinct integer value identifying the newly created
+    '''
     session = DBSession()
     newUser = User(name=login_session['username'],
                    email=login_session['email'],
@@ -164,12 +192,29 @@ def createUser(login_session):
 
 
 def getUserInfo(user_id):
+    ''' Collect user information from the database
+
+    Args:
+        user_id: user id in the database
+
+    Returns:
+       user: user object associated with the user id provided as arg
+    '''
     session = DBSession()
     user = session.query(User).filter_by(id=user_id).one()
     return user
 
 
 def getUserID(email):
+    ''' Collect user id from the database
+
+    Args:
+        email: user email address
+
+    Returns:
+        user.id: generated distinct integer value identifying the newly created
+        None: when email is not found
+    '''
     try:
         session = DBSession()
         user = session.query(User).filter_by(email=email).one()
@@ -180,10 +225,36 @@ def getUserID(email):
 
 # Operations on Category
 
+
+def login_required(f):
+    ''' Check whether user is signed in
+
+    Args:
+        f: the function we are wrapping
+
+    Returns:
+        decorated_function: the function we are wrapping when user is signed in
+        redirect: redirect to login page when user is not signed in
+    '''
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'username' not in login_session:
+            return redirect(url_for('showLogin'))
+        return f(*args, **kwargs)
+    return decorated_function
+
 # Show all categories
+
+
 @app.route('/')
 @app.route('/category/')
 def showCategories():
+    ''' Show all categories available in the database
+
+
+    Returns:
+        Page that shows all the categories
+    '''
     session = DBSession()
     categories = session.query(Category).order_by(asc(Category.name))
     if 'username' not in login_session:
@@ -194,10 +265,17 @@ def showCategories():
 
 # Create a new category
 @app.route('/category/new/', methods=['GET', 'POST'])
+@login_required
 def newCategory():
+    ''' Create new category in the database
+
+
+    Returns:
+        on GET: page to create a new category
+        on POST: redirect to main page after category is created.
+        to loging page when user is not signed in
+    '''
     session = DBSession()
-    if 'username' not in login_session:
-        return redirect(url_for('showLogin'))
     if request.method == 'POST':
         newCategory = Category(
             name=request.form['name'], user_id=login_session['user_id'])
@@ -210,10 +288,17 @@ def newCategory():
 
 # Edit a Category
 @app.route('/category/<int:category_id>/edit/', methods=['GET', 'POST'])
+@login_required
 def editCategory(category_id):
+    ''' Edit specific category in the database
+
+
+    Returns:
+        on GET: page to edit category
+        on POST: redirect to main page after category is created.
+        to loging page when user is not signed in
+    '''
     session = DBSession()
-    if 'username' not in login_session:
-        return redirect(url_for('showLogin'))
     editedCategory = session.query(Category).filter_by(id=category_id).one()
     if request.method == 'POST':
         if request.form['name']:
@@ -227,10 +312,17 @@ def editCategory(category_id):
 
 # Delete a Category
 @app.route('/category/<int:category_id>/delete/', methods=['GET', 'POST'])
+@login_required
 def deleteCategory(category_id):
+    ''' Delete category from the database
+
+
+    Returns:
+        on GET: page to delete category
+        on POST: redirect to main page after category deleted.
+        to loging page when user is not signed in
+    '''
     session = DBSession()
-    if 'username' not in login_session:
-        return redirect(url_for('showLogin'))
     categoryToDelete = session.query(Category).filter_by(id=category_id).one()
     if request.method == 'POST':
         session.delete(categoryToDelete)
@@ -246,6 +338,13 @@ def deleteCategory(category_id):
 # Show a category items
 @app.route('/category/<int:category_id>/')
 def showItem(category_id):
+    ''' Show all items available under specific category
+
+
+    Returns:
+        To public items page when user is not signed in
+        To main items page when user is signed in
+    '''
     session = DBSession()
     category = session.query(Category).filter_by(id=category_id).one()
     creator = getUserInfo(category.user_id)
@@ -265,6 +364,12 @@ def showItem(category_id):
 # Show an item details
 @app.route('/category/<int:category_id>/<int:item_id>')
 def showItemDetails(category_id, item_id):
+    ''' Show details for specific item
+
+
+    Returns:
+        Show item details page
+    '''
     session = DBSession()
     item = session.query(Item).filter_by(id=item_id).one()
     return render_template('showItem.html', item=item)
@@ -272,9 +377,16 @@ def showItemDetails(category_id, item_id):
 
 # Create a new item
 @app.route('/category/<int:category_id>/new/', methods=['GET', 'POST'])
+@login_required
 def newItem(category_id):
-    if 'username' not in login_session:
-        return redirect(url_for('showLogin'))
+    ''' Create new item in the database
+
+
+    Returns:
+        on GET: page to create a new item
+        on POST: redirect to main page after item is created.
+        to loging page when user is not signed in
+    '''
     session = DBSession()
     category = session.query(Category).filter_by(id=category_id).one()
     if request.method == 'POST':
@@ -298,9 +410,16 @@ def newItem(category_id):
 
 @app.route('/category/<int:category_id>/<int:item_id>/edit',
            methods=['GET', 'POST'])
+@login_required
 def editItem(category_id, item_id):
-    if 'username' not in login_session:
-        return redirect(url_for('showLogin'))
+    ''' Edit item in the database
+
+
+    Returns:
+        on GET: page to edit an item
+        on POST: redirect to main page after item is edited.
+        to loging page when user is not signed in
+    '''
     session = DBSession()
     editedItem = session.query(Item).filter_by(id=item_id).one()
     if editedItem.user_id != login_session['user_id']:
@@ -326,9 +445,16 @@ def editItem(category_id, item_id):
 # Delete an item
 @app.route('/category/<int:category_id>/<int:item_id>/delete',
            methods=['GET', 'POST'])
+@login_required
 def deleteItem(category_id, item_id):
-    if 'username' not in login_session:
-        return redirect(url_for('showLogin'))
+    ''' Delete item from the database
+
+
+    Returns:
+        on GET: page to delete item
+        on POST: redirect to main page after item is deleted.
+        to loging page when user is not signed in
+    '''
     session = DBSession()
     itemToDelete = session.query(Item).filter_by(id=item_id).one()
     if itemToDelete.user_id != login_session['user_id']:
@@ -346,10 +472,36 @@ def deleteItem(category_id, item_id):
 # JSON APIs to view all categories
 @app.route('/api/v<int:version>/category')
 def categoryJSON(version):
+    ''' Create JSON end-point to show all categories
+
+
+    Returns:
+        JSON end-point with all the categories
+        JSON end-point with error when version is invalid
+    '''
     if version == 1:
         session = DBSession()
         category = session.query(Category).all()
         return jsonify(Category=[i.serialize for i in category])
+    else:
+        return jsonify({"error": "Invalid version number"})
+
+# JSON APIs to view all items
+
+
+@app.route('/api/v<int:version>/items')
+def itemJSON(version):
+    ''' Create JSON end-point to show all items
+
+
+    Returns:
+        JSON end-point with all the items
+        JSON end-point with error when version is invalid
+    '''
+    if version == 1:
+        session = DBSession()
+        category = session.query(Item).all()
+        return jsonify(Items=[i.serialize for i in category])
     else:
         return jsonify({"error": "Invalid version number"})
 
@@ -358,6 +510,13 @@ def categoryJSON(version):
 
 @app.route('/api/v<int:version>/category/<int:category_id>')
 def categoryItemsJSON(version, category_id):
+    ''' Create JSON end-point to show all items in specific category
+
+
+    Returns:
+        JSON end-point with all the items in specific category
+        JSON end-point with error when version is invalid
+    '''
     if version == 1:
         session = DBSession()
         items = session.query(Item).filter_by(category_id=category_id).all()
@@ -369,6 +528,13 @@ def categoryItemsJSON(version, category_id):
 # JSON APIs to view specific item information
 @app.route('/api/v<int:version>/category/<int:category_id>/item/<int:item_id>')
 def iTemsJSON(version, category_id, item_id):
+    ''' Create JSON end-point with specific item details
+
+
+    Returns:
+        JSON end-point with specific item details
+        JSON end-point with error when version is invalid
+    '''
     if version == 1:
         session = DBSession()
         item = session.query(Item).filter_by(id=item_id).one()
