@@ -7,6 +7,8 @@ Base = declarative_base()
 
 
 class User(Base):
+    ''' Registered user information is stored in database
+    '''
     __tablename__ = 'user'
 
     id = Column(Integer, primary_key=True)
@@ -16,6 +18,8 @@ class User(Base):
 
 
 class Category(Base):
+    ''' Added categories are stored in the database
+    '''
     __tablename__ = 'category'
 
     id = Column(Integer, primary_key=True)
@@ -30,10 +34,13 @@ class Category(Base):
         return {
             'name': self.name,
             'id': self.id,
+            'user_id': self.id
         }
 
 
 class Item(Base):
+    ''' Added items are stored in the database
+    '''
     __tablename__ = 'item'
 
     name = Column(String(80), nullable=False)
@@ -53,6 +60,8 @@ class Item(Base):
             'description': self.description,
             'id': self.id,
             'image': self.image,
+            'category_id': self.category_id,
+            'user_id': self.user_id
         }
 
 

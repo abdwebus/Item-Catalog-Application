@@ -1,7 +1,12 @@
 #! /usr/bin/env python3
 
-from flask import Flask, render_template, request
-from flask import redirect, jsonify, url_for
+from flask import (Flask,
+                   render_template,
+                   request,
+                   redirect,
+                   jsonify,
+                   url_for)
+
 from functools import wraps
 from sqlalchemy import create_engine, asc
 from sqlalchemy.orm import sessionmaker
@@ -47,7 +52,7 @@ def showLogin():
     state = ''.join(random.choice(string.ascii_uppercase +
                                   string.digits) for x in xrange(32))
     login_session['state'] = state
-    return render_template('login.html', STATE=state)
+    return render_template('login.html', STATE=state, CLIENT_ID = CLIENT_ID)
 
 # Handle google login
 
@@ -128,7 +133,7 @@ def gconnect():
 
     data = answer.json()
 
-    login_session['username'] = data['name']
+    login_session['username'] = data.get('name', 'Stranger :) ')
     login_session['picture'] = data['picture']
     login_session['email'] = data['email']
 
@@ -300,6 +305,8 @@ def editCategory(category_id):
     '''
     session = DBSession()
     editedCategory = session.query(Category).filter_by(id=category_id).one()
+    if editedCategory.user_id != login_session['user_id']:
+        return redirect(url_for('showItem', category_id=category_id))
     if request.method == 'POST':
         if request.form['name']:
             editedCategory.name = request.form['name']
@@ -324,6 +331,8 @@ def deleteCategory(category_id):
     '''
     session = DBSession()
     categoryToDelete = session.query(Category).filter_by(id=category_id).one()
+    if categoryToDelete.user_id != login_session['user_id']:
+        return redirect(url_for('showItem', category_id=category_id))
     if request.method == 'POST':
         session.delete(categoryToDelete)
         session.commit()
